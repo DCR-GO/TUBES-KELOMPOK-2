@@ -194,7 +194,7 @@ public:
                 delete curr;             // bebaskan memori
                 jumlah--;
                 cout << "\n  [OK] Data \"" << namaHapus
-                     << "\" berhasil dihapus.\n";
+                     << "\" berhasil dihapus bro.\n";
                 return;
             }
             prev = curr;
