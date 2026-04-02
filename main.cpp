@@ -280,7 +280,6 @@ int main() {
         cout << "  ║  2. Tambah Mahasiswa      (Insert)        ║\n";
         cout << "  ║  3. Cari Mahasiswa        (Search)        ║\n";
         cout << "  ║  4. Hapus Mahasiswa       (Delete)        ║\n";
-        cout << "  ║  5. Update IPK                            ║\n";
         cout << "  ║  0. Keluar                                ║\n";
         cout << "  ╚═══════════════════════════════════════════╝\n";
         cout << "  Pilihan: ";
