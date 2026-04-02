@@ -261,7 +261,7 @@ int main() {
     db.insert("2600002", "Budi Santoso",    "SNBT",    "Teknik Elektro");
     db.insert("2600003", "Citra Dewi",      "Mandiri", "Pendidikan Bahasa");
     db.insert("2600004", "Dwicky Pratama",  "SNBT",    "Rek. Perangkat Lunak");
-    db.insert("2600005", "Eva Rahmawati",   "SNBP",    "Matematika");
+    db.insert("2600005", "Syifa Indah",   "SNBP",    "Matematika");
 
     // Loop menu utama
     do {
