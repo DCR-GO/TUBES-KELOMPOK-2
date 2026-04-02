@@ -257,11 +257,11 @@ int main() {
     int pilihan;
 
     // Data awal: beberapa mahasiswa yang sudah diterima
-    db.insert("2600001", "Andi Saputra",    "SNBP",    "Ilmu Komputer",     3.85f);
-    db.insert("2600002", "Budi Santoso",    "SNBT",    "Teknik Elektro",    3.72f);
-    db.insert("2600003", "Citra Dewi",      "Mandiri", "Pendidikan Bahasa", 3.60f);
-    db.insert("2600004", "Dwicky Pratama",  "SNBT",    "Rek. Perangkat Lunak", 3.90f);
-    db.insert("2600005", "Eva Rahmawati",   "SNBP",    "Matematika",        3.78f);
+    db.insert("2600001", "Andi Saputra",    "SNBP",    "Ilmu Komputer");
+    db.insert("2600002", "Budi Santoso",    "SNBT",    "Teknik Elektro");
+    db.insert("2600003", "Citra Dewi",      "Mandiri", "Pendidikan Bahasa");
+    db.insert("2600004", "Dwicky Pratama",  "SNBT",    "Rek. Perangkat Lunak");
+    db.insert("2600005", "Eva Rahmawati",   "SNBP",    "Matematika");
 
     // Loop menu utama
     do {
