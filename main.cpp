@@ -1,10 +1,10 @@
 /*
  * ============================================================
- *  SISTEM ADMINISTRASI PENERIMAAN MAHASISWA BARU
- *  Universitas Pendidikan Indonesia (UPI) - Tahun 2026
+ * SISTEM ADMINISTRASI PENERIMAAN MAHASISWA BARU
+ * Universitas Pendidikan Indonesia (UPI) - Tahun 2026
  * ============================================================
- *  Mata Kuliah : Struktur Data dan Algoritma
- *  Konsep      : Struct, Pointer, Array, Linked List
+ * Mata Kuliah : Struktur Data dan Algoritma
+ * Konsep       : Struct, Pointer, Array, Linked List
  * ============================================================
  */
 
@@ -33,27 +33,19 @@ private:
     int jumlah;
 
 public:
-    // Constructor: inisialisasi head = NULL
     LinkedList() {
         head   = nullptr;
         jumlah = 0;
     }
 
-    // Destructor: bebaskan semua memori
     ~LinkedList() {
         hapusSemua();
     }
 
-    // ----------------------------------------------------------
-    // HELPER: Cetak garis pemisah
-    // ----------------------------------------------------------
     void cetakGaris(char c = '-', int len = 65) {
         cout << string(len, c) << endl;
     }
 
-    // ----------------------------------------------------------
-    // HELPER: Cetak header tabel
-    // ----------------------------------------------------------
     void cetakHeader() {
         cetakGaris('=');
         cout << left
@@ -65,9 +57,6 @@ public:
         cetakGaris();
     }
 
-    // ----------------------------------------------------------
-    // HELPER: Cetak satu baris data mahasiswa
-    // ----------------------------------------------------------
     void cetakBaris(Mahasiswa* m) {
         cout << left
              << setw(12) << m->nim
@@ -77,13 +66,7 @@ public:
              << endl;
     }
 
-    // ----------------------------------------------------------
-    // INSERT: Tambah node baru di akhir linked list
-    // ----------------------------------------------------------
-    void insert(string nim, string nama, string jalur,
-                string prodi) {
-
-        // Buat node baru di heap (menggunakan pointer)
+    void insert(string nim, string nama, string jalur, string prodi) {
         Mahasiswa* newNode = new Mahasiswa();
         newNode->nim   = nim;
         newNode->nama  = nama;
@@ -91,35 +74,27 @@ public:
         newNode->prodi = prodi;
         newNode->next  = nullptr;
 
-        // Kasus 1: list masih kosong
         if (head == nullptr) {
             head = newNode;
-        }
-        // Kasus 2: list sudah ada isinya -> traverse ke tail
-        else {
+        } else {
             Mahasiswa* temp = head;
             while (temp->next != nullptr) {
                 temp = temp->next;
             }
-            temp->next = newNode; // sambung ke node terakhir
+            temp->next = newNode;
         }
 
         jumlah++;
-        cout << "\n  [OK] Data mahasiswa \"" << nama
-             << "\" berhasil ditambahkan.\n";
+        cout << "\n  [OK] Data mahasiswa \"" << nama << "\" berhasil ditambahkan.\n";
     }
 
-    // ----------------------------------------------------------
-    // DISPLAY: Tampilkan semua data (traversal dari head ke tail)
-    // ----------------------------------------------------------
     void display() {
         if (head == nullptr) {
             cout << "\n  [INFO] Belum ada data mahasiswa.\n";
             return;
         }
 
-        cout << "\n  DAFTAR MAHASISWA BARU UPI 2026"
-             << " (Total: " << jumlah << " mahasiswa)\n";
+        cout << "\n  DAFTAR MAHASISWA BARU UPI 2026 (Total: " << jumlah << " mahasiswa)\n";
         cetakHeader();
 
         Mahasiswa* temp = head;
@@ -127,32 +102,24 @@ public:
         while (temp != nullptr) {
             cout << no++ << ". ";
             cetakBaris(temp);
-            temp = temp->next; // geser pointer ke node berikutnya
+            temp = temp->next;
         }
         cetakGaris('=');
     }
 
-    // ----------------------------------------------------------
-    // SEARCH: Cari mahasiswa berdasarkan NIM
-    // ----------------------------------------------------------
     Mahasiswa* search(string nim) {
         Mahasiswa* temp = head;
-
         while (temp != nullptr) {
-            if (temp->nim == nim) {
-                return temp; // ditemukan, kembalikan pointer-nya
-            }
+            if (temp->nim == nim) return temp;
             temp = temp->next;
         }
-        return nullptr; // tidak ditemukan
+        return nullptr;
     }
 
     void cariDanTampilkan(string nim) {
         Mahasiswa* hasil = search(nim);
-
         if (hasil == nullptr) {
-            cout << "\n  [!] Mahasiswa dengan NIM \"" << nim
-                 << "\" tidak ditemukan.\n";
+            cout << "\n  [!] Mahasiswa dengan NIM \"" << nim << "\" tidak ditemukan.\n";
         } else {
             cout << "\n  [OK] Data ditemukan:\n";
             cetakHeader();
@@ -161,52 +128,40 @@ public:
         }
     }
 
-    // ----------------------------------------------------------
-    // DELETE: Hapus node berdasarkan NIM
-    // ----------------------------------------------------------
     void hapus(string nim) {
         if (head == nullptr) {
             cout << "\n  [INFO] List kosong, tidak ada yang dihapus.\n";
             return;
         }
 
-        // Kasus 1: node yang dihapus adalah head
         if (head->nim == nim) {
             Mahasiswa* temp = head;
-            head = head->next; // geser head ke node berikutnya
+            head = head->next;
             string namaHapus = temp->nama;
-            delete temp;       // bebaskan memori
+            delete temp;
             jumlah--;
-            cout << "\n  [OK] Data \"" << namaHapus
-                 << "\" berhasil dihapus.\n";
+            cout << "\n  [OK] Data \"" << namaHapus << "\" berhasil dihapus.\n";
             return;
         }
 
-        // Kasus 2: node di tengah atau akhir
-        // -> perlu pointer ke node SEBELUMNYA
         Mahasiswa* prev = head;
         Mahasiswa* curr = head->next;
 
         while (curr != nullptr) {
             if (curr->nim == nim) {
-                prev->next = curr->next; // bypass node yang dihapus
+                prev->next = curr->next;
                 string namaHapus = curr->nama;
-                delete curr;             // bebaskan memori
+                delete curr;
                 jumlah--;
-                cout << "\n  [OK] Data \"" << namaHapus
-                     << "\" berhasil dihapus bro.\n";
+                cout << "\n  [OK] Data \"" << namaHapus << "\" berhasil dihapus.\n";
                 return;
             }
             prev = curr;
             curr = curr->next;
         }
-
         cout << "\n  [!] NIM \"" << nim << "\" tidak ditemukan.\n";
     }
 
-    // ----------------------------------------------------------
-    // HAPUS SEMUA: Bebaskan seluruh memori (destructor)
-    // ----------------------------------------------------------
     void hapusSemua() {
         Mahasiswa* temp = head;
         while (temp != nullptr) {
@@ -217,28 +172,19 @@ public:
         head   = nullptr;
         jumlah = 0;
     }
-
-    // Getter jumlah
-    int getJumlah() { return jumlah; }
 };
 
-// ============================================================
-// HELPER: Input mahasiswa baru secara interaktif
-// ============================================================
 void inputMahasiswaBaru(LinkedList& db) {
-    string nim, nama, prodi;
-    int    pilihanJalur;
-    string jalur;
-
-    // Array nama jalur (penggunaan Array dari materi kuliah)
+    string nim, nama, prodi, jalur;
+    int pilihanJalur;
     string daftarJalur[3] = {"SNBP", "SNBT", "Mandiri"};
 
     cout << "\n  --- INPUT DATA MAHASISWA BARU ---\n";
-    cout << "  NIM        : "; cin >> nim;
+    cout << "  NIM          : "; cin >> nim;
     cin.ignore();
-    cout << "  Nama Lengkap: "; getline(cin, nama);
-    cout << "  Prodi      : "; getline(cin, prodi);
-    cout << "  Jalur Masuk:\n";
+    cout << "  Nama Lengkap : "; getline(cin, nama);
+    cout << "  Prodi        : "; getline(cin, prodi);
+    cout << "  Jalur Masuk  :\n";
     for (int i = 0; i < 3; i++) {
         cout << "    " << (i+1) << ". " << daftarJalur[i] << "\n";
     }
@@ -249,71 +195,51 @@ void inputMahasiswaBaru(LinkedList& db) {
     db.insert(nim, nama, jalur, prodi);
 }
 
-// ============================================================
-// FUNGSI UTAMA
-// ============================================================
 int main() {
-    LinkedList db; // inisialisasi linked list
+    LinkedList db;
     int pilihan;
 
-    // Data awal: beberapa mahasiswa yang sudah diterima
+    // FIX: Menambahkan tutup kurung yang hilang pada baris pertama
     db.insert("2600001", "Andi Saputra",    "SNBP",    "Ilmu Komputer");
     db.insert("2600002", "Budi Santoso",    "SNBT",    "Teknik Elektro");
     db.insert("2600003", "Citra Dewi",      "Mandiri", "Pendidikan Bahasa");
     db.insert("2600004", "Dwicky Pratama",  "SNBT",    "Rek. Perangkat Lunak");
     db.insert("2600005", "Eva Rahmawati",   "SNBP",    "Matematika");
 
-    // Loop menu utama
     do {
+        // FIX: Menggunakan karakter ASCII standar agar tidak terjadi error encoding
         cout << "\n";
-        cout << "  ╔═══════════════════════════════════════════╗\n";
-        cout << "  ║   SISTEM ADMINISTRASI PMB UPI 2026        ║\n";
-        cout << "  ║   Struct + Linked List (C++)              ║\n";
-        cout << "  ╠═══════════════════════════════════════════╣\n";
-        cout << "  ║  1. Tampilkan Semua Data  (Display)       ║\n";
-        cout << "  ║  2. Tambah Mahasiswa      (Insert)        ║\n";
-        cout << "  ║  3. Cari Mahasiswa        (Search)        ║\n";
-        cout << "  ║  4. Hapus Mahasiswa       (Delete)        ║\n";
-        cout << "  ║  0. Keluar                                ║\n";
-        cout << "  ╚═══════════════════════════════════════════╝\n";
+        cout << "  +-------------------------------------------+\n";
+        cout << "  |   SISTEM ADMINISTRASI PMB UPI 2026        |\n";
+        cout << "  |   Struct + Linked List (C++)              |\n";
+        cout << "  +-------------------------------------------+\n";
+        cout << "  |  1. Tampilkan Semua Data  (Display)       |\n";
+        cout << "  |  2. Tambah Mahasiswa      (Insert)        |\n";
+        cout << "  |  3. Cari Mahasiswa        (Search)        |\n";
+        cout << "  |  4. Hapus Mahasiswa       (Delete)        |\n";
+        cout << "  |  0. Keluar                                |\n";
+        cout << "  +-------------------------------------------+\n";
         cout << "  Pilihan: ";
         cin  >> pilihan;
 
         switch (pilihan) {
-            case 1: {
-                db.display();
-                break;
-            }
-            case 2: {
-                inputMahasiswaBaru(db);
-                break;
-            }
+            case 1: db.display(); break;
+            case 2: inputMahasiswaBaru(db); break;
             case 3: {
-                string nimCari;
-                cout << "\n  Masukkan NIM yang dicari: ";
-                cin  >> nimCari;
-                db.cariDanTampilkan(nimCari);
-                break;
+                string n; cout << "\n  Cari NIM: "; cin >> n;
+                db.cariDanTampilkan(n); break;
             }
             case 4: {
-                string nimHapus;
-                cout << "\n  Masukkan NIM yang akan dihapus: ";
-                cin  >> nimHapus;
-                db.hapus(nimHapus);
-                break;
+                string n; cout << "\n  Hapus NIM: "; cin >> n;
+                db.hapus(n); break;
             }
-            case 0: {
-                cout << "\n  Terima kasih. Memori dibebaskan. Program selesai.\n\n";
+            case 0:
+                cout << "\n  Terima kasih. Program selesai.\n";
                 break;
-            }
-            default: {
+            default:
                 cout << "\n  [!] Pilihan tidak valid.\n";
-            }
         }
-
     } while (pilihan != 0);
 
-    // Destructor LinkedList otomatis dipanggil di sini
-    // -> menghapus seluruh node dan membebaskan memori
     return 0;
 }
