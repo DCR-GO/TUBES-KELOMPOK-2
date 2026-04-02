@@ -209,22 +209,6 @@ public:
     }
 
     // ----------------------------------------------------------
-    // UPDATE: Ubah IPK mahasiswa berdasarkan NIM
-    // ----------------------------------------------------------
-    void updateIPK(string nim, float ipkBaru) {
-        Mahasiswa* m = search(nim);
-        if (m == nullptr) {
-            cout << "\n  [!] NIM \"" << nim << "\" tidak ditemukan.\n";
-            return;
-        }
-        float ipkLama = m->ipk;
-        m->ipk = ipkBaru;
-        cout << "\n  [OK] IPK \"" << m->nama << "\" diperbarui: "
-             << fixed << setprecision(2)
-             << ipkLama << " -> " << ipkBaru << "\n";
-    }
-
-    // ----------------------------------------------------------
     // HAPUS SEMUA: Bebaskan seluruh memori (destructor)
     // ----------------------------------------------------------
     void hapusSemua() {
@@ -323,16 +307,6 @@ int main() {
                 cout << "\n  Masukkan NIM yang akan dihapus: ";
                 cin  >> nimHapus;
                 db.hapus(nimHapus);
-                break;
-            }
-            case 5: {
-                string nimUpdate;
-                float  ipkBaru;
-                cout << "\n  Masukkan NIM: ";
-                cin  >> nimUpdate;
-                cout << "  IPK baru   : ";
-                cin  >> ipkBaru;
-                db.updateIPK(nimUpdate, ipkBaru);
                 break;
             }
             case 0: {
