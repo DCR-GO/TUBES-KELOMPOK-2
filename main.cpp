@@ -21,7 +21,6 @@ struct Mahasiswa {
     string nama;
     string jalur;    // SNBP / SNBT / Mandiri
     string prodi;
-    float  ipk;      // IPK awal (bisa 0.0 saat baru diterima)
     Mahasiswa* next; // Pointer ke node berikutnya (Linked List)
 };
 
@@ -62,7 +61,6 @@ public:
              << setw(22) << "Nama"
              << setw(10) << "Jalur"
              << setw(16) << "Prodi"
-             << setw(5)  << "IPK"
              << endl;
         cetakGaris();
     }
@@ -76,7 +74,6 @@ public:
              << setw(22) << m->nama
              << setw(10) << m->jalur
              << setw(16) << m->prodi
-             << fixed << setprecision(2) << m->ipk
              << endl;
     }
 
@@ -84,7 +81,7 @@ public:
     // INSERT: Tambah node baru di akhir linked list
     // ----------------------------------------------------------
     void insert(string nim, string nama, string jalur,
-                string prodi, float ipk) {
+                string prodi) {
 
         // Buat node baru di heap (menggunakan pointer)
         Mahasiswa* newNode = new Mahasiswa();
@@ -92,7 +89,6 @@ public:
         newNode->nama  = nama;
         newNode->jalur = jalur;
         newNode->prodi = prodi;
-        newNode->ipk   = ipk;
         newNode->next  = nullptr;
 
         // Kasus 1: list masih kosong
@@ -231,7 +227,6 @@ public:
 // ============================================================
 void inputMahasiswaBaru(LinkedList& db) {
     string nim, nama, prodi;
-    float  ipk;
     int    pilihanJalur;
     string jalur;
 
@@ -250,9 +245,8 @@ void inputMahasiswaBaru(LinkedList& db) {
     cout << "  Pilih (1-3): "; cin >> pilihanJalur;
     if (pilihanJalur < 1 || pilihanJalur > 3) pilihanJalur = 1;
     jalur = daftarJalur[pilihanJalur - 1];
-    cout << "  IPK Awal   : "; cin >> ipk;
 
-    db.insert(nim, nama, jalur, prodi, ipk);
+    db.insert(nim, nama, jalur, prodi);
 }
 
 // ============================================================
