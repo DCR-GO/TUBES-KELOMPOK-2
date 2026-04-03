@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-// UTS SDA Kelompok 2 
-=======
 #include <iostream>
 #include <string>
 #include <iomanip>
@@ -15,6 +12,72 @@ struct Mahasiswa {
     Mahasiswa* next;
 };
 
+Mahasiswa* head       = nullptr;
+string daftarJalur[3] = {"SNBP", "SNBT", "Mandiri"};
+
+//  HELPER [Tolongin saya plis] (Rapi)
+void cetakHeader() {
+    cout << string(55, '=') << endl;
+    cout << left
+         << setw(12) << "NIM"
+         << setw(22) << "Nama"
+         << setw(10) << "Jalur"
+         << "Prodi" << endl;
+    cout << string(55, '-') << endl;
+}
+
+void cetakBaris(Mahasiswa* m) {
+    cout << left
+         << setw(12) << m->nim
+         << setw(22) << m->nama
+         << setw(10) << m->jalur
+         << m->prodi
+         << endl;
+}
+
+// ============================================================
+//  INSERT
+// ============================================================
+void insert(string nim, string nama, string jalur, string prodi) {
+
+    Mahasiswa* newNode = new Mahasiswa();
+    newNode->nim   = nim;
+    newNode->nama  = nama;
+    newNode->jalur = jalur;
+    newNode->prodi = prodi;
+    newNode->next  = nullptr;
+
+    if (head == nullptr) {
+        head = newNode;
+    } else {
+        Mahasiswa* temp = head;
+        while (temp->next != nullptr) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+
+    cout << "  [OK] Data \"" << nama << "\" berhasil ditambahkan.\n";
+}
+
+void inputMahasiswaBaru() {
+    string nim, nama, prodi;
+    int    pilihanJalur;
+
+    cout << "\n  --- INPUT DATA MAHASISWA BARU ---\n";
+    cout << "  NIM         : "; cin >> nim;
+    cin.ignore();
+    cout << "  Nama Lengkap: "; getline(cin, nama);
+    cout << "  Prodi       : "; getline(cin, prodi);
+    cout << "  Jalur Masuk :\n";
+    for (int i = 0; i < 3; i++) {
+        cout << "    " << (i + 1) << ". " << daftarJalur[i] << "\n";
+    }
+    cout << "  Pilih (1-3) : "; cin >> pilihanJalur;
+    if (pilihanJalur < 1 || pilihanJalur > 3) pilihanJalur = 1;
+
+    insert(nim, nama, daftarJalur[pilihanJalur - 1], prodi);
+}
 
 
 // ============================================================
@@ -79,4 +142,3 @@ int main() {
     hapusSemua();
     return 0;
 }
->>>>>>> 279c2f550d70305326a5f464328aee0a0b579fda
