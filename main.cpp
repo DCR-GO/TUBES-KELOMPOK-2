@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-// UTS SDA Kelompok 2 
-=======
 #include <iostream>
 #include <string>
 #include <iomanip>
@@ -15,8 +12,28 @@ struct Mahasiswa {
     Mahasiswa* next;
 };
 
+Mahasiswa* head       = nullptr;
+string daftarJalur[3] = {"SNBP", "SNBT", "Mandiri"};
 
+//  HELPER [Tolongin saya plis] (Rapi)
+void cetakHeader() {
+    cout << string(55, '=') << endl;
+    cout << left
+         << setw(12) << "NIM"
+         << setw(22) << "Nama"
+         << setw(10) << "Jalur"
+         << "Prodi" << endl;
+    cout << string(55, '-') << endl;
+}
 
+void cetakBaris(Mahasiswa* m) {
+    cout << left
+         << setw(12) << m->nim
+         << setw(22) << m->nama
+         << setw(10) << m->jalur
+         << m->prodi
+         << endl;
+}
 // ============================================================
 //  MENU & MAIN
 // ============================================================
@@ -79,4 +96,3 @@ int main() {
     hapusSemua();
     return 0;
 }
->>>>>>> 279c2f550d70305326a5f464328aee0a0b579fda
