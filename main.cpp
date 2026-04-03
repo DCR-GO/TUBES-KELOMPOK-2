@@ -134,6 +134,49 @@ void cariDanTampilkan(string nim) {
     }
 }
 
+// DELETE [Hapus aja apa ya vs code?] (Rapi)
+void hapus(string nim) {
+    if (head == nullptr) {
+        cout << "\n  [INFO] List kosong, tidak ada yang dihapus.\n";
+        return;
+    }
+
+    // Kasus 1: hapus head
+    if (head->nim == nim) {
+        Mahasiswa* temp = head;
+        head = head->next;
+        cout << "\n  [OK] Data \"" << temp->nama << "\" berhasil dihapus.\n";
+        delete temp;
+        return;
+    }
+
+    // Kasus 2: hapus node tengah / akhir
+    Mahasiswa* prev = head;
+    Mahasiswa* curr = head->next;
+
+    while (curr != nullptr) {
+        if (curr->nim == nim) {
+            prev->next = curr->next;
+            cout << "\n  [OK] Data \"" << curr->nama << "\" berhasil dihapus.\n";
+            delete curr;
+            return;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+
+    cout << "\n  [!] NIM \"" << nim << "\" tidak ditemukan.\n";
+}
+
+void hapusSemua() {
+    Mahasiswa* temp = head;
+    while (temp != nullptr) {
+        Mahasiswa* next = temp->next;
+        delete temp;
+        temp = next;
+    }
+    head = nullptr;
+}
 
 // ============================================================
 //  MENU & MAIN
