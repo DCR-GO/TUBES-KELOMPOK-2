@@ -48,6 +48,74 @@ void tampilRiwayat() {
     }
 }
 
+NodeStack* topStack = NULL;
+int ukuranStack = 0;
+
+void pushPaket(string id, string pengirim, string penerima, string tujuan) {
+    NodeStack* baru = new NodeStack();
+    baru->idPaket   = id;
+    baru->pengirim  = pengirim;
+    baru->penerima  = penerima;
+    baru->tujuan    = tujuan;
+    baru->next      = topStack;
+    topStack        = baru;
+    ukuranStack++;
+    cout << "  [OK] Paket '" << id << "' berhasil diinput.\n";
+}
+
+void undoPaket() {
+    if (topStack == NULL) {
+        cout << "  [!] Stack kosong, tidak ada paket yang bisa dibatalkan.\n";
+        return;
+    }
+    NodeStack* hapus = topStack;
+    cout << "  [UNDO] Paket '" << hapus->idPaket << "' dibatalkan.\n";
+    topStack = topStack->next;
+    delete hapus;
+    ukuranStack--;
+}
+
+void tampilStack() {
+    if (topStack == NULL) {
+        cout << "  [!] Tidak ada paket dalam antrian input.\n";
+        return;
+    }
+    NodeStack* temp = topStack;
+    int no = 1;
+    cout << "  (Teratas = input terakhir)\n";
+    while (temp != NULL) {
+        cout << "  " << no++ << ". ID: " << temp->idPaket
+             << " | " << temp->pengirim << " -> " << temp->penerima
+             << " (" << temp->tujuan << ")\n";
+        temp = temp->next;
+    }
+}
+
+void menuStack() {
+    int pilihan = -1;
+    while (pilihan != 0) {
+        cout << "\n====== MENU INPUT PAKET (Stack) ======\n";
+        cout << "  1. Input paket baru\n";
+        cout << "  2. Tampilkan antrian paket\n";
+        cout << "  3. Undo (batalkan paket terakhir)\n";
+        cout << "  0. Kembali ke menu utama\n";
+        cout << "Pilihan: "; cin >> pilihan; cin.ignore();
+
+        if (pilihan == 1) {
+            string id, pengirim, penerima, tujuan;
+            cout << "  ID Paket   : "; getline(cin, id);
+            cout << "  Pengirim   : "; getline(cin, pengirim);
+            cout << "  Penerima   : "; getline(cin, penerima);
+            cout << "  Kota Tujuan: "; getline(cin, tujuan);
+            pushPaket(id, pengirim, penerima, tujuan);
+        } else if (pilihan == 2) {
+            tampilStack();
+        } else if (pilihan == 3) {
+            undoPaket();
+        }
+    }
+}
+
 // Menghubungkan Stack milik Orang 1 ke Linked List
 void kirimSemuaPaket(NodeStack* &topStack, int &ukuranStack) {
     if (topStack == NULL) {
@@ -139,8 +207,84 @@ void bfsRuteTerpendek(int asal, int tujuan) {
     cout << "\n";
 }
 
-#include <iostream>
-using namespace std;
+void menuLinkedList() {
+    int pilihan = -1;
+    while (pilihan != 0) {
+        cout << "\n====== MENU RIWAYAT PENGIRIMAN (Linked List) ======\n";
+        cout << "  1. Tampilkan riwayat semua paket\n";
+        cout << "  0. Kembali ke menu utama\n";
+        cout << "Pilihan: ";
+        cin >> pilihan;
+        cin.ignore();
+
+        if (pilihan == 1) {
+            cout << "\n-- Riwayat Paket Terkirim --\n";
+            tampilRiwayat();
+        }
+    }
+}
+
+void menuStack() {
+    int pilihan = -1;
+    while (pilihan != 0) {
+        cout << "\n====== MENU INPUT PAKET (Stack) ======\n";
+        cout << "  1. Input paket baru\n";
+        cout << "  2. Tampilkan antrian paket\n";
+        cout << "  3. Undo (batalkan paket terakhir)\n";
+        cout << "  4. Kirim semua paket\n";
+        cout << "  0. Kembali ke menu utama\n";
+        cout << "Pilihan: ";
+        cin >> pilihan;
+        cin.ignore();
+
+        if (pilihan == 1) {
+            string id, pengirim, penerima, tujuan;
+            cout << "  ID Paket   : "; getline(cin, id);
+            cout << "  Pengirim   : "; getline(cin, pengirim);
+            cout << "  Penerima   : "; getline(cin, penerima);
+            cout << "  Kota Tujuan: "; getline(cin, tujuan);
+            pushPaket(id, pengirim, penerima, tujuan);
+        } else if (pilihan == 2) {
+            cout << "\n-- Antrian Paket (Stack) --\n";
+            tampilStack();
+        } else if (pilihan == 3) {
+            undoPaket();
+        } else if (pilihan == 4) {
+            kirimSemuaPaket();
+        }
+    }
+}
+
+void menuGraph() {
+    int pilihan = -1;
+    while (pilihan != 0) {
+        cout << "\n====== MENU RUTE PENGIRIMAN (Graph + BFS) ======\n";
+        cout << "  1. Cari rute terpendek antar kota\n";
+        cout << "  2. Tampilkan semua koneksi kota\n";
+        cout << "  0. Kembali ke menu utama\n";
+        cout << "Pilihan: ";
+        cin >> pilihan;
+        cin.ignore();
+
+        if (pilihan == 1) {
+            tampilDaftarKota();
+            int asal, tujuan;
+            cout << "  Pilih nomor kota ASAL   : "; cin >> asal;
+            cout << "  Pilih nomor kota TUJUAN : "; cin >> tujuan;
+            cin.ignore();
+
+            if (asal < 0 || asal >= MAX_KOTA || tujuan < 0 || tujuan >= MAX_KOTA) {
+                cout << "  [!] Nomor kota tidak valid.\n";
+            } else {
+                cout << "\n";
+                bfsRuteTerpendek(asal, tujuan);
+            }
+        } else if (pilihan == 2) {
+            cout << "\n-- Peta Koneksi Kota --\n";
+            tampilGraphKoneksi();
+        }
+    }
+}
 
 // ============================================================
 //  CODE ORANG 5: MAIN & SYSTEM INTEGRATION
