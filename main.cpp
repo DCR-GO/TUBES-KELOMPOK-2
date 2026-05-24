@@ -3,6 +3,84 @@
 #include <queue>
 using namespace std;
 
+struct NodeRiwayat {
+    string idPaket;
+    string pengirim;
+    string penerima;
+    string tujuan;
+    NodeRiwayat* next;
+};
+
+NodeRiwayat* headRiwayat = NULL;
+
+void tambahRiwayat(string id, string pengirim, string penerima, string tujuan) {
+    NodeRiwayat* baru = new NodeRiwayat();
+    baru->idPaket   = id;
+    baru->pengirim  = pengirim;
+    baru->penerima  = penerima;
+    baru->tujuan    = tujuan;
+    baru->next      = NULL;
+
+    if (headRiwayat == NULL) {
+        headRiwayat = baru;
+    } else {
+        NodeRiwayat* temp = headRiwayat;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = baru;
+    }
+}
+
+void tampilRiwayat() {
+    if (headRiwayat == NULL) {
+        cout << "  [!] Belum ada riwayat pengiriman.\n";
+        return;
+    }
+    NodeRiwayat* temp = headRiwayat;
+    int no = 1;
+    while (temp != NULL) {
+        cout << "  " << no++ << ". ID: " << temp->idPaket
+             << " | Pengirim: " << temp->pengirim
+             << " | Penerima: " << temp->penerima
+             << " | Tujuan: "   << temp->tujuan << "\n";
+        temp = temp->next;
+    }
+}
+
+// Menghubungkan Stack milik Orang 1 ke Linked List
+void kirimSemuaPaket(NodeStack* &topStack, int &ukuranStack) {
+    if (topStack == NULL) {
+        cout << "  [!] Tidak ada paket di antrian.\n";
+        return;
+    }
+    cout << "  [KIRIM] Memproses semua paket...\n";
+    while (topStack != NULL) {
+        NodeStack* temp = topStack;
+        tambahRiwayat(temp->idPaket, temp->pengirim, temp->penerima, temp->tujuan);
+        cout << "  >> Paket '" << temp->idPaket << "' dikirim ke " << temp->tujuan << "\n";
+        topStack = topStack->next;
+        delete temp;
+        ukuranStack--;
+    }
+    cout << "  [OK] Semua paket berhasil dikirim dan dicatat ke riwayat.\n";
+}
+
+void menuLinkedList() {
+    int pilihan = -1;
+    while (pilihan != 0) {
+        cout << "\n====== MENU RIWAYAT PENGIRIMAN (Linked List) ======\n";
+        cout << "  1. Tampilkan riwayat semua paket\n";
+        cout << "  0. Kembali ke menu utama\n";
+        cout << "Pilihan: "; cin >> pilihan; cin.ignore();
+
+        if (pilihan == 1) {
+            tampilRiwayat();
+        }
+    }
+}
+
+
 void bfsRuteTerpendek(int asal, int tujuan) {
     if (asal == tujuan) {
         cout << "  [!] Kota asal dan tujuan sama.\n";
@@ -100,3 +178,4 @@ int main() {
     cout << "\n  Terima kasih telah menggunakan Sistem Kurir!\n";
     return 0;
 }
+
