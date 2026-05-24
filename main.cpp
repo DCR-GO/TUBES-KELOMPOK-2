@@ -1,242 +1,62 @@
 #include <iostream>
 #include <string>
-#include <iomanip>
+#include <queue>
 using namespace std;
 
-// INI STRUCT (Rapi)
-struct Mahasiswa {
-    string nim;
-    string nama;
-    string jalur;    // SNBP / SNBT / Mandiri
-    string prodi;
-    Mahasiswa* next;
-};
+void bfsRuteTerpendek(int asal, int tujuan) {
+    if (asal == tujuan) {
+        cout << "  [!] Kota asal dan tujuan sama.\n";
+        return;
+    }
 
-Mahasiswa* head       = nullptr;
-string daftarJalur[3] = {"SNBP", "SNBT", "Mandiri"};
+    bool dikunjungi[MAX_KOTA] = {false};
+    int  parent[MAX_KOTA];
+    for (int i = 0; i < MAX_KOTA; i++) parent[i] = -1;
 
-//  HELPER [Tolongin saya plis] (Rapi)
-void cetakHeader() {
-    cout << string(55, '=') << endl;
-    cout << left
-         << setw(12) << "NIM"
-         << setw(22) << "Nama"
-         << setw(10) << "Jalur"
-         << "Prodi" << endl;
-    cout << string(55, '-') << endl;
-}
+    queue<int> q;
+    q.push(asal);
+    dikunjungi[asal] = true;
 
-void cetakBaris(Mahasiswa* m) {
-    cout << left
-         << setw(12) << m->nim
-         << setw(22) << m->nama
-         << setw(10) << m->jalur
-         << m->prodi
-         << endl;
-}
+    bool ketemu = false;
 
-// ============================================================
-//  INSERT
-// ============================================================
-void insert(string nim, string nama, string jalur, string prodi) {
+    while (!q.empty()) {
+        int kini = q.front();
+        q.pop();
 
-    Mahasiswa* newNode = new Mahasiswa();
-    newNode->nim   = nim;
-    newNode->nama  = nama;
-    newNode->jalur = jalur;
-    newNode->prodi = prodi;
-    newNode->next  = nullptr;
-
-    if (head == nullptr) {
-        head = newNode;
-    } else {
-        Mahasiswa* temp = head;
-        while (temp->next != nullptr) {
-            temp = temp->next;
+        if (kini == tujuan) {
+            ketemu = true;
+            break;
         }
-        temp->next = newNode;
-    }
 
-    cout << "  [OK] Data \"" << nama << "\" berhasil ditambahkan.\n";
-}
-
-void inputMahasiswaBaru() {
-    string nim, nama, prodi;
-    int    pilihanJalur;
-
-    cout << "\n  --- INPUT DATA MAHASISWA BARU ---\n";
-    cout << "  NIM         : "; cin >> nim;
-    cin.ignore();
-    cout << "  Nama Lengkap: "; getline(cin, nama);
-    cout << "  Prodi       : "; getline(cin, prodi);
-    cout << "  Jalur Masuk :\n";
-    for (int i = 0; i < 3; i++) {
-        cout << "    " << (i + 1) << ". " << daftarJalur[i] << "\n";
-    }
-    cout << "  Pilih (1-3) : "; cin >> pilihanJalur;
-    if (pilihanJalur < 1 || pilihanJalur > 3) pilihanJalur = 1;
-
-    insert(nim, nama, daftarJalur[pilihanJalur - 1], prodi);
-}
-
-// ============================================================
-//  DISPLAY
-// ============================================================
-void display() {
-    if (head == nullptr) {
-        cout << "\n  [INFO] Belum ada data mahasiswa.\n";
-        return;
-    }
-
-    int total = 0;
-    Mahasiswa* hitung = head;
-    while (hitung != nullptr) {
-        total++;
-        hitung = hitung->next;
-    }
-
-    cout << "\n  DAFTAR MAHASISWA BARU UPI 2026"
-         << " (Total: " << total << " mahasiswa)\n";
-    cetakHeader();
-
-    Mahasiswa* temp = head;
-    int no = 1;
-    while (temp != nullptr) {
-        cout << no++ << ". ";
-        cetakBaris(temp);
-        temp = temp->next;
-    }
-
-    cout << string(55, '=') << endl;
-}
-
-// ============================================================
-//  SEARCH
-// ============================================================
-Mahasiswa* search(string nim) {
-    Mahasiswa* temp = head;
-    while (temp != nullptr) {
-        if (temp->nim == nim) return temp;
-        temp = temp->next;
-    }
-    return nullptr;
-}
-
-void cariDanTampilkan(string nim) {
-    Mahasiswa* hasil = search(nim);
-    if (hasil == nullptr) {
-        cout << "\n  [!] NIM \"" << nim << "\" tidak ditemukan.\n";
-    } else {
-        cout << "\n  [OK] Data ditemukan:\n";
-        cetakHeader();
-        cetakBaris(hasil);
-        cout << string(55, '=') << endl;
-    }
-}
-
-// DELETE [Hapus aja apa ya vs code?] (Rapi)
-void hapus(string nim) {
-    if (head == nullptr) {
-        cout << "\n  [INFO] List kosong, tidak ada yang dihapus.\n";
-        return;
-    }
-
-    // Kasus 1: hapus head
-    if (head->nim == nim) {
-        Mahasiswa* temp = head;
-        head = head->next;
-        cout << "\n  [OK] Data \"" << temp->nama << "\" berhasil dihapus.\n";
-        delete temp;
-        return;
-    }
-
-    // Kasus 2: hapus node tengah / akhir
-    Mahasiswa* prev = head;
-    Mahasiswa* curr = head->next;
-
-    while (curr != nullptr) {
-        if (curr->nim == nim) {
-            prev->next = curr->next;
-            cout << "\n  [OK] Data \"" << curr->nama << "\" berhasil dihapus.\n";
-            delete curr;
-            return;
+        for (int j = 0; j < MAX_KOTA; j++) {
+            if (adjMatrix[kini][j] && !dikunjungi[j]) {
+                dikunjungi[j] = true;
+                parent[j]     = kini;
+                q.push(j);
+            }
         }
-        prev = curr;
-        curr = curr->next;
     }
 
-    cout << "\n  [!] NIM \"" << nim << "\" tidak ditemukan.\n";
-}
-
-void hapusSemua() {
-    Mahasiswa* temp = head;
-    while (temp != nullptr) {
-        Mahasiswa* next = temp->next;
-        delete temp;
-        temp = next;
+    if (!ketemu) {
+        cout << "  [!] Tidak ada rute dari "
+             << namaKota[asal] << " ke " << namaKota[tujuan] << ".\n";
+        return;
     }
-    head = nullptr;
-}
 
-// ============================================================
-//  MENU & MAIN
-// ============================================================
-void tampilMenu() {
+    // Rekonstruksi jalur dari tujuan balik ke asal
+    int jalur[MAX_KOTA];
+    int panjang = 0;
+    int kini = tujuan;
+    while (kini != -1) {
+        jalur[panjang++] = kini;
+        kini = parent[kini];
+    }
+
+    // Tampilkan dari asal ke tujuan (balik array)
+    cout << "  Rute terpendek (" << panjang - 1 << " langkah):\n  ";
+    for (int i = panjang - 1; i >= 0; i--) {
+        cout << namaKota[jalur[i]];
+        if (i > 0) cout << " -> ";
+    }
     cout << "\n";
-    cout << "  +-------------------------------------------+\n";
-    cout << "  |   SISTEM ADMINISTRASI PMB UPI 2026        |\n";
-    cout << "  |   Struct + Linked List (C++)              |\n";
-    cout << "  +-------------------------------------------+\n";
-    cout << "  |  1. Tampilkan Semua Data  (Display)       |\n";
-    cout << "  |  2. Tambah Mahasiswa      (Insert)        |\n";
-    cout << "  |  3. Cari Mahasiswa        (Search)        |\n";
-    cout << "  |  4. Hapus Mahasiswa       (Delete)        |\n";
-    cout << "  |  0. Keluar                                |\n";
-    cout << "  +-------------------------------------------+\n";
-    cout << "  Pilihan: ";
-}
-
-int main() {
-
-    // Data awal mahasiswa yang sudah diterima
-    insert("2600001", "Andi Saputra",   "SNBP",    "Ilmu Komputer");
-    insert("2600002", "Budi Santoso",   "SNBT",    "Teknik Elektro");
-    insert("2600003", "Citra Dewi",     "Mandiri", "Pendidikan Bahasa");
-    insert("2600004", "Pratama Putra", "SNBT",    "Rek. Perangkat Lunak");
-    insert("2600005", "Eva Rahmawati",  "SNBP",    "Matematika");
-
-    int pilihan = -1;
-
-    while (pilihan != 0) {
-        tampilMenu();
-        cin >> pilihan;
-
-        if (pilihan == 1) {
-            display();
-
-        } else if (pilihan == 2) {
-            inputMahasiswaBaru();
-
-        } else if (pilihan == 3) {
-            string nimCari;
-            cout << "\n  Masukkan NIM yang dicari: ";
-            cin  >> nimCari;
-            cariDanTampilkan(nimCari);
-
-        } else if (pilihan == 4) {
-            string nimHapus;
-            cout << "\n  Masukkan NIM yang dihapus: ";
-            cin  >> nimHapus;
-            hapus(nimHapus);
-
-        } else if (pilihan == 0) {
-            cout << "\n  Terima kasih. Sampai jumpa!\n\n";
-
-        } else {
-            cout << "\n  [!] Pilihan tidak valid. Coba lagi.\n";
-        }
-    }
-
-    hapusSemua();
-    return 0;
 }
