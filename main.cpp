@@ -148,6 +148,59 @@ void menuLinkedList() {
     }
 }
 
+//Rapi 
+bool adjMatrix[MAX_KOTA][MAX_KOTA] = {false};
+
+void inisialisasiGraph() {
+
+    int koneksi[][2] = {
+        {0,5}, {0,3}, {0,6},
+        {1,3}, {1,4}, {1,2}, {1,7},
+        {2,4}, {2,6},
+        {3,7}, {3,4},
+        {4,5},
+        {5,6}
+    };
+
+    int total = sizeof(koneksi) / sizeof(koneksi[0]);
+    for (int i = 0; i < total; i++) {
+        int a = koneksi[i][0];
+        int b = koneksi[i][1];
+        adjMatrix[a][b] = true;
+        adjMatrix[b][a] = true;
+    }
+}
+
+int cariIndexKota(string nama) {
+    for (int i = 0; i < MAX_KOTA; i++) {
+        if (namaKota[i] == nama) return i;
+    }
+    return -1;
+}
+
+void tampilDaftarKota() {
+    cout << "  Daftar kota yang tersedia:\n";
+    for (int i = 0; i < MAX_KOTA; i++) {
+        cout << "  [" << i << "] " << namaKota[i] << "\n";
+    }
+}
+
+void tampilGraphKoneksi() {
+    cout << "  Koneksi antar kota:\n";
+    for (int i = 0; i < MAX_KOTA; i++) {
+        cout << "  " << namaKota[i] << " terhubung ke: ";
+        bool ada = false;
+        for (int j = 0; j < MAX_KOTA; j++) {
+            if (adjMatrix[i][j]) {
+                if (ada) cout << ", ";
+                cout << namaKota[j];
+                ada = true;
+            }
+        }
+        if (!ada) cout << "(tidak ada koneksi)";
+        cout << "\n";
+    }
+}
 
 void bfsRuteTerpendek(int asal, int tujuan) {
     if (asal == tujuan) {
