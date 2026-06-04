@@ -1,242 +1,378 @@
 #include <iostream>
 #include <string>
-#include <iomanip>
+#include <queue>
 using namespace std;
 
-// INI STRUCT (Rapi)
-struct Mahasiswa {
-    string nim;
-    string nama;
-    string jalur;    // SNBP / SNBT / Mandiri
-    string prodi;
-    Mahasiswa* next;
+struct NodeRiwayat {
+    string idPaket;
+    string pengirim;
+    string penerima;
+    string tujuan;
+    NodeRiwayat* next;
 };
 
-Mahasiswa* head       = nullptr;
-string daftarJalur[3] = {"SNBP", "SNBT", "Mandiri"};
+NodeRiwayat* headRiwayat = NULL;
 
-//  HELPER [Tolongin saya plis] (Rapi)
-void cetakHeader() {
-    cout << string(55, '=') << endl;
-    cout << left
-         << setw(12) << "NIM"
-         << setw(22) << "Nama"
-         << setw(10) << "Jalur"
-         << "Prodi" << endl;
-    cout << string(55, '-') << endl;
-}
+void tambahRiwayat(string id, string pengirim, string penerima, string tujuan) {
+    NodeRiwayat* baru = new NodeRiwayat();
+    baru->idPaket   = id;
+    baru->pengirim  = pengirim;
+    baru->penerima  = penerima;
+    baru->tujuan    = tujuan;
+    baru->next      = NULL;
 
-void cetakBaris(Mahasiswa* m) {
-    cout << left
-         << setw(12) << m->nim
-         << setw(22) << m->nama
-         << setw(10) << m->jalur
-         << m->prodi
-         << endl;
-}
-
-// ============================================================
-//  INSERT
-// ============================================================
-void insert(string nim, string nama, string jalur, string prodi) {
-
-    Mahasiswa* newNode = new Mahasiswa();
-    newNode->nim   = nim;
-    newNode->nama  = nama;
-    newNode->jalur = jalur;
-    newNode->prodi = prodi;
-    newNode->next  = nullptr;
-
-    if (head == nullptr) {
-        head = newNode;
+    if (headRiwayat == NULL) {
+        headRiwayat = baru;
     } else {
-        Mahasiswa* temp = head;
-        while (temp->next != nullptr) {
+        NodeRiwayat* temp = headRiwayat;
+        while (temp->next != NULL) {
             temp = temp->next;
         }
-        temp->next = newNode;
+        temp->next = baru;
     }
-
-    cout << "  [OK] Data \"" << nama << "\" berhasil ditambahkan.\n";
 }
 
-void inputMahasiswaBaru() {
-    string nim, nama, prodi;
-    int    pilihanJalur;
-
-    cout << "\n  --- INPUT DATA MAHASISWA BARU ---\n";
-    cout << "  NIM         : "; cin >> nim;
-    cin.ignore();
-    cout << "  Nama Lengkap: "; getline(cin, nama);
-    cout << "  Prodi       : "; getline(cin, prodi);
-    cout << "  Jalur Masuk :\n";
-    for (int i = 0; i < 3; i++) {
-        cout << "    " << (i + 1) << ". " << daftarJalur[i] << "\n";
-    }
-    cout << "  Pilih (1-3) : "; cin >> pilihanJalur;
-    if (pilihanJalur < 1 || pilihanJalur > 3) pilihanJalur = 1;
-
-    insert(nim, nama, daftarJalur[pilihanJalur - 1], prodi);
-}
-
-// ============================================================
-//  DISPLAY
-// ============================================================
-void display() {
-    if (head == nullptr) {
-        cout << "\n  [INFO] Belum ada data mahasiswa.\n";
+void tampilRiwayat() {
+    if (headRiwayat == NULL) {
+        cout << "  [!] Belum ada riwayat pengiriman.\n";
         return;
     }
-
-    int total = 0;
-    Mahasiswa* hitung = head;
-    while (hitung != nullptr) {
-        total++;
-        hitung = hitung->next;
-    }
-
-    cout << "\n  DAFTAR MAHASISWA BARU UPI 2026"
-         << " (Total: " << total << " mahasiswa)\n";
-    cetakHeader();
-
-    Mahasiswa* temp = head;
+    NodeRiwayat* temp = headRiwayat;
     int no = 1;
-    while (temp != nullptr) {
-        cout << no++ << ". ";
-        cetakBaris(temp);
+    while (temp != NULL) {
+        cout << "  " << no++ << ". ID: " << temp->idPaket
+             << " | Pengirim: " << temp->pengirim
+             << " | Penerima: " << temp->penerima
+             << " | Tujuan: "   << temp->tujuan << "\n";
         temp = temp->next;
     }
-
-    cout << string(55, '=') << endl;
 }
 
-// ============================================================
-//  SEARCH
-// ============================================================
-Mahasiswa* search(string nim) {
-    Mahasiswa* temp = head;
-    while (temp != nullptr) {
-        if (temp->nim == nim) return temp;
+NodeStack* topStack = NULL;
+int ukuranStack = 0;
+
+void pushPaket(string id, string pengirim, string penerima, string tujuan) {
+    NodeStack* baru = new NodeStack();
+    baru->idPaket   = id;
+    baru->pengirim  = pengirim;
+    baru->penerima  = penerima;
+    baru->tujuan    = tujuan;
+    baru->next      = topStack;
+    topStack        = baru;
+    ukuranStack++;
+    cout << "  [OK] Paket '" << id << "' berhasil diinput.\n";
+}
+
+void undoPaket() {
+    if (topStack == NULL) {
+        cout << "  [!] Stack kosong, tidak ada paket yang bisa dibatalkan.\n";
+        return;
+    }
+    NodeStack* hapus = topStack;
+    cout << "  [UNDO] Paket '" << hapus->idPaket << "' dibatalkan.\n";
+    topStack = topStack->next;
+    delete hapus;
+    ukuranStack--;
+}
+
+void tampilStack() {
+    if (topStack == NULL) {
+        cout << "  [!] Tidak ada paket dalam antrian input.\n";
+        return;
+    }
+    NodeStack* temp = topStack;
+    int no = 1;
+    cout << "  (Teratas = input terakhir)\n";
+    while (temp != NULL) {
+        cout << "  " << no++ << ". ID: " << temp->idPaket
+             << " | " << temp->pengirim << " -> " << temp->penerima
+             << " (" << temp->tujuan << ")\n";
         temp = temp->next;
     }
-    return nullptr;
 }
 
-void cariDanTampilkan(string nim) {
-    Mahasiswa* hasil = search(nim);
-    if (hasil == nullptr) {
-        cout << "\n  [!] NIM \"" << nim << "\" tidak ditemukan.\n";
-    } else {
-        cout << "\n  [OK] Data ditemukan:\n";
-        cetakHeader();
-        cetakBaris(hasil);
-        cout << string(55, '=') << endl;
-    }
-}
-
-// DELETE [Hapus aja apa ya vs code?] (Rapi)
-void hapus(string nim) {
-    if (head == nullptr) {
-        cout << "\n  [INFO] List kosong, tidak ada yang dihapus.\n";
-        return;
-    }
-
-    // Kasus 1: hapus head
-    if (head->nim == nim) {
-        Mahasiswa* temp = head;
-        head = head->next;
-        cout << "\n  [OK] Data \"" << temp->nama << "\" berhasil dihapus.\n";
-        delete temp;
-        return;
-    }
-
-    // Kasus 2: hapus node tengah / akhir
-    Mahasiswa* prev = head;
-    Mahasiswa* curr = head->next;
-
-    while (curr != nullptr) {
-        if (curr->nim == nim) {
-            prev->next = curr->next;
-            cout << "\n  [OK] Data \"" << curr->nama << "\" berhasil dihapus.\n";
-            delete curr;
-            return;
-        }
-        prev = curr;
-        curr = curr->next;
-    }
-
-    cout << "\n  [!] NIM \"" << nim << "\" tidak ditemukan.\n";
-}
-
-void hapusSemua() {
-    Mahasiswa* temp = head;
-    while (temp != nullptr) {
-        Mahasiswa* next = temp->next;
-        delete temp;
-        temp = next;
-    }
-    head = nullptr;
-}
-
-// ============================================================
-//  MENU & MAIN
-// ============================================================
-void tampilMenu() {
-    cout << "\n";
-    cout << "  +-------------------------------------------+\n";
-    cout << "  |   SISTEM ADMINISTRASI PMB UPI 2026        |\n";
-    cout << "  |   Struct + Linked List (C++)              |\n";
-    cout << "  +-------------------------------------------+\n";
-    cout << "  |  1. Tampilkan Semua Data  (Display)       |\n";
-    cout << "  |  2. Tambah Mahasiswa      (Insert)        |\n";
-    cout << "  |  3. Cari Mahasiswa        (Search)        |\n";
-    cout << "  |  4. Hapus Mahasiswa       (Delete)        |\n";
-    cout << "  |  0. Keluar                                |\n";
-    cout << "  +-------------------------------------------+\n";
-    cout << "  Pilihan: ";
-}
-
-int main() {
-
-    // Data awal mahasiswa yang sudah diterima
-    insert("2600001", "Andi Saputra",   "SNBP",    "Ilmu Komputer");
-    insert("2600002", "Budi Santoso",   "SNBT",    "Teknik Elektro");
-    insert("2600003", "Citra Dewi",     "Mandiri", "Pendidikan Bahasa");
-    insert("2600004", "Pratama Putra", "SNBT",    "Rek. Perangkat Lunak");
-    insert("2600005", "Eva Rahmawati",  "SNBP",    "Matematika");
-
+void menuStack() {
     int pilihan = -1;
-
     while (pilihan != 0) {
-        tampilMenu();
-        cin >> pilihan;
+        cout << "\n====== MENU INPUT PAKET (Stack) ======\n";
+        cout << "  1. Input paket baru\n";
+        cout << "  2. Tampilkan antrian paket\n";
+        cout << "  3. Undo (batalkan paket terakhir)\n";
+        cout << "  0. Kembali ke menu utama\n";
+        cout << "Pilihan: "; cin >> pilihan; cin.ignore();
 
         if (pilihan == 1) {
-            display();
-
+            string id, pengirim, penerima, tujuan;
+            cout << "  ID Paket   : "; getline(cin, id);
+            cout << "  Pengirim   : "; getline(cin, pengirim);
+            cout << "  Penerima   : "; getline(cin, penerima);
+            cout << "  Kota Tujuan: "; getline(cin, tujuan);
+            pushPaket(id, pengirim, penerima, tujuan);
         } else if (pilihan == 2) {
-            inputMahasiswaBaru();
-
+            tampilStack();
         } else if (pilihan == 3) {
-            string nimCari;
-            cout << "\n  Masukkan NIM yang dicari: ";
-            cin  >> nimCari;
-            cariDanTampilkan(nimCari);
+            undoPaket();
+        }
+    }
+}
 
-        } else if (pilihan == 4) {
-            string nimHapus;
-            cout << "\n  Masukkan NIM yang dihapus: ";
-            cin  >> nimHapus;
-            hapus(nimHapus);
+// Menghubungkan Stack milik Orang 1 ke Linked List
+void kirimSemuaPaket(NodeStack* &topStack, int &ukuranStack) {
+    if (topStack == NULL) {
+        cout << "  [!] Tidak ada paket di antrian.\n";
+        return;
+    }
+    cout << "  [KIRIM] Memproses semua paket...\n";
+    while (topStack != NULL) {
+        NodeStack* temp = topStack;
+        tambahRiwayat(temp->idPaket, temp->pengirim, temp->penerima, temp->tujuan);
+        cout << "  >> Paket '" << temp->idPaket << "' dikirim ke " << temp->tujuan << "\n";
+        topStack = topStack->next;
+        delete temp;
+        ukuranStack--;
+    }
+    cout << "  [OK] Semua paket berhasil dikirim dan dicatat ke riwayat.\n";
+}
 
-        } else if (pilihan == 0) {
-            cout << "\n  Terima kasih. Sampai jumpa!\n\n";
+void menuLinkedList() {
+    int pilihan = -1;
+    while (pilihan != 0) {
+        cout << "\n====== MENU RIWAYAT PENGIRIMAN (Linked List) ======\n";
+        cout << "  1. Tampilkan riwayat semua paket\n";
+        cout << "  0. Kembali ke menu utama\n";
+        cout << "Pilihan: "; cin >> pilihan; cin.ignore();
 
-        } else {
-            cout << "\n  [!] Pilihan tidak valid. Coba lagi.\n";
+        if (pilihan == 1) {
+            tampilRiwayat();
+        }
+    }
+}
+
+//Rapi 
+bool adjMatrix[MAX_KOTA][MAX_KOTA] = {false};
+
+void inisialisasiGraph() {
+
+    int koneksi[][2] = {
+        {0,5}, {0,3}, {0,6},
+        {1,3}, {1,4}, {1,2}, {1,7},
+        {2,4}, {2,6},
+        {3,7}, {3,4},
+        {4,5},
+        {5,6}
+    };
+
+    int total = sizeof(koneksi) / sizeof(koneksi[0]);
+    for (int i = 0; i < total; i++) {
+        int a = koneksi[i][0];
+        int b = koneksi[i][1];
+        adjMatrix[a][b] = true;
+        adjMatrix[b][a] = true;
+    }
+}
+
+int cariIndexKota(string nama) {
+    for (int i = 0; i < MAX_KOTA; i++) {
+        if (namaKota[i] == nama) return i;
+    }
+    return -1;
+}
+
+void tampilDaftarKota() {
+    cout << "  Daftar kota yang tersedia:\n";
+    for (int i = 0; i < MAX_KOTA; i++) {
+        cout << "  [" << i << "] " << namaKota[i] << "\n";
+    }
+}
+
+void tampilGraphKoneksi() {
+    cout << "  Koneksi antar kota:\n";
+    for (int i = 0; i < MAX_KOTA; i++) {
+        cout << "  " << namaKota[i] << " terhubung ke: ";
+        bool ada = false;
+        for (int j = 0; j < MAX_KOTA; j++) {
+            if (adjMatrix[i][j]) {
+                if (ada) cout << ", ";
+                cout << namaKota[j];
+                ada = true;
+            }
+        }
+        if (!ada) cout << "(tidak ada koneksi)";
+        cout << "\n";
+    }
+}
+
+void bfsRuteTerpendek(int asal, int tujuan) {
+    if (asal == tujuan) {
+        cout << "  [!] Kota asal dan tujuan sama.\n";
+        return;
+    }
+
+    bool dikunjungi[MAX_KOTA] = {false};
+    int  parent[MAX_KOTA];
+    for (int i = 0; i < MAX_KOTA; i++) parent[i] = -1;
+
+    queue<int> q;
+    q.push(asal);
+    dikunjungi[asal] = true;
+
+    bool ketemu = false;
+
+    while (!q.empty()) {
+        int kini = q.front();
+        q.pop();
+
+        if (kini == tujuan) {
+            ketemu = true;
+            break;
+        }
+
+        for (int j = 0; j < MAX_KOTA; j++) {
+            if (adjMatrix[kini][j] && !dikunjungi[j]) {
+                dikunjungi[j] = true;
+                parent[j]     = kini;
+                q.push(j);
+            }
         }
     }
 
-    hapusSemua();
+    if (!ketemu) {
+        cout << "  [!] Tidak ada rute dari "
+             << namaKota[asal] << " ke " << namaKota[tujuan] << ".\n";
+        return;
+    }
+
+    // Rekonstruksi jalur dari tujuan balik ke asal
+    int jalur[MAX_KOTA];
+    int panjang = 0;
+    int kini = tujuan;
+    while (kini != -1) {
+        jalur[panjang++] = kini;
+        kini = parent[kini];
+    }
+
+    // Tampilkan dari asal ke tujuan (balik array)
+    cout << "  Rute terpendek (" << panjang - 1 << " langkah):\n  ";
+    for (int i = panjang - 1; i >= 0; i--) {
+        cout << namaKota[jalur[i]];
+        if (i > 0) cout << " -> ";
+    }
+    cout << "\n";
+}
+
+void menuLinkedList() {
+    int pilihan = -1;
+    while (pilihan != 0) {
+        cout << "\n====== MENU RIWAYAT PENGIRIMAN (Linked List) ======\n";
+        cout << "  1. Tampilkan riwayat semua paket\n";
+        cout << "  0. Kembali ke menu utama\n";
+        cout << "Pilihan: ";
+        cin >> pilihan;
+        cin.ignore();
+
+        if (pilihan == 1) {
+            cout << "\n-- Riwayat Paket Terkirim --\n";
+            tampilRiwayat();
+        }
+    }
+}
+
+void menuStack() {
+    int pilihan = -1;
+    while (pilihan != 0) {
+        cout << "\n====== MENU INPUT PAKET (Stack) ======\n";
+        cout << "  1. Input paket baru\n";
+        cout << "  2. Tampilkan antrian paket\n";
+        cout << "  3. Undo (batalkan paket terakhir)\n";
+        cout << "  4. Kirim semua paket\n";
+        cout << "  0. Kembali ke menu utama\n";
+        cout << "Pilihan: ";
+        cin >> pilihan;
+        cin.ignore();
+
+        if (pilihan == 1) {
+            string id, pengirim, penerima, tujuan;
+            cout << "  ID Paket   : "; getline(cin, id);
+            cout << "  Pengirim   : "; getline(cin, pengirim);
+            cout << "  Penerima   : "; getline(cin, penerima);
+            cout << "  Kota Tujuan: "; getline(cin, tujuan);
+            pushPaket(id, pengirim, penerima, tujuan);
+        } else if (pilihan == 2) {
+            cout << "\n-- Antrian Paket (Stack) --\n";
+            tampilStack();
+        } else if (pilihan == 3) {
+            undoPaket();
+        } else if (pilihan == 4) {
+            kirimSemuaPaket();
+        }
+    }
+}
+
+void menuGraph() {
+    int pilihan = -1;
+    while (pilihan != 0) {
+        cout << "\n====== MENU RUTE PENGIRIMAN (Graph + BFS) ======\n";
+        cout << "  1. Cari rute terpendek antar kota\n";
+        cout << "  2. Tampilkan semua koneksi kota\n";
+        cout << "  0. Kembali ke menu utama\n";
+        cout << "Pilihan: ";
+        cin >> pilihan;
+        cin.ignore();
+
+        if (pilihan == 1) {
+            tampilDaftarKota();
+            int asal, tujuan;
+            cout << "  Pilih nomor kota ASAL   : "; cin >> asal;
+            cout << "  Pilih nomor kota TUJUAN : "; cin >> tujuan;
+            cin.ignore();
+
+            if (asal < 0 || asal >= MAX_KOTA || tujuan < 0 || tujuan >= MAX_KOTA) {
+                cout << "  [!] Nomor kota tidak valid.\n";
+            } else {
+                cout << "\n";
+                bfsRuteTerpendek(asal, tujuan);
+            }
+        } else if (pilihan == 2) {
+            cout << "\n-- Peta Koneksi Kota --\n";
+            tampilGraphKoneksi();
+        }
+    }
+}
+
+// ============================================================
+//  CODE ORANG 5: MAIN & SYSTEM INTEGRATION
+// ============================================================
+int main() {
+    // 1. Inisialisasi peta awal kurir (Punya Orang 3)
+    inisialisasiGraph();
+
+    // 2. Load Dummy Data awal ke dalam Riwayat (Punya Orang 2)
+    // Berfungsi agar saat demo program didepan dosen tidak kosong melompong.
+    tambahRiwayat("PKT001", "Andi",  "Budi",  "Jakarta");
+    tambahRiwayat("PKT002", "Citra", "Dani",  "Bogor");
+    tambahRiwayat("PKT003", "Eka",   "Fandi", "Bekasi");
+
+    int pilihan;
+    do {
+        cout << "\n========================================\n";
+        cout << "   SISTEM MANAJEMEN KURIR - RPL UPI\n";
+        cout << "========================================\n";
+        cout << "  1. Input & Kelola Paket  (Stack)\n";
+        cout << "  2. Riwayat Pengiriman    (Linked List)\n";
+        cout << "  3. Cari Rute Pengiriman  (Graph + BFS)\n";
+        cout << "  4. Kirim Semua Paket Di Antrian\n"; // Menu tambahan integrasi
+        cout << "  0. Keluar\n";
+        cout << "Pilihan: "; cin >> pilihan; cin.ignore();
+
+        if      (pilihan == 1) menuStack();        // Punya Orang 1
+        else if (pilihan == 2) menuLinkedList();   // Punya Orang 2
+        else if (pilihan == 3) menuGraph();        // Punya Orang 4
+        else if (pilihan == 4) kirimSemuaPaket(topStack, ukuranStack); // Integrasi Orang 1 & 2
+        else if (pilihan != 0) cout << "  [!] Pilihan tidak valid.\n";
+
+    } while (pilihan != 0);
+
+    cout << "\n  Terima kasih telah menggunakan Sistem Kurir!\n";
     return 0;
 }
+
