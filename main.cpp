@@ -7,6 +7,32 @@ using namespace std;
 
 const string FILE_CSV = "riwayat.csv";
 
+int inputAngka() {
+    int nilai;
+    string baris;
+    getline(cin, baris);
+    if (baris.empty()) return -99;
+ 
+    bool valid = true;
+    int i = 0;
+    if (baris[0] == '-') i = 1;
+    if (i >= (int)baris.size()) valid = false;
+ 
+    while (i < (int)baris.size()) {
+        if (baris[i] < '0' || baris[i] > '9') {
+            valid = false;
+            break;
+        }
+        i++;
+    }
+ 
+    if (!valid) return -99;
+ 
+    stringstream ss(baris);
+    ss >> nilai;
+    return nilai;
+}
+
 const int MAX_KOTA = 8;
 string namaKota[MAX_KOTA] = {
     "Bandung", "Jakarta", "Bogor", "Bekasi",
@@ -282,11 +308,14 @@ void menuLinkedList() {
         cout << "  0. Kembali ke menu utama\n";
         cout << "Pilihan: ";
         cin >> pilihan;
-        cin.ignore();
+        pilihan = inputAngka();
 
         if (pilihan == 1) {
             cout << "\n-- Riwayat Paket Terkirim --\n";
             tampilRiwayat();
+        }
+        else if (pilihan != 0) {
+            cout << "  [!] Pilihan tidak valid. Masukkan 0 atau 1.\n";
         }
     }
 }
@@ -301,25 +330,57 @@ void menuStack() {
         cout << "  4. Kirim semua paket\n";
         cout << "  0. Kembali ke menu utama\n";
         cout << "Pilihan: ";
-        cin >> pilihan;
-        cin.ignore();
+        pilihan = inputAngka();
 
         if (pilihan == 1) {
             string id, pengirim, penerima, tujuan;
-            cout << "  ID Paket   : "; getline(cin, id);
-            cout << "  Pengirim   : "; getline(cin, pengirim);
-            cout << "  Penerima   : "; getline(cin, penerima);
-            cout << "  Kota Tujuan: "; getline(cin, tujuan);
+                        while (id.empty()) {
+                cout << "  ID Paket   : ";
+                getline(cin, id);
+                if (id.empty()) cout << "  [!] ID Paket tidak boleh kosong.\n";
+            }
+            while (pengirim.empty()) {
+                cout << "  Pengirim   : ";
+                getline(cin, pengirim);
+                if (pengirim.empty()) cout << "  [!] Nama pengirim tidak boleh kosong.\n";
+            }
+            while (penerima.empty()) {
+                cout << "  Penerima   : ";
+                getline(cin, penerima);
+                if (penerima.empty()) cout << "  [!] Nama penerima tidak boleh kosong.\n";
+            }
+ 
+            bool kotaValid = false;
+            while (!kotaValid) {
+                cout << "  Kota Tujuan (";
+                for (int i = 0; i < MAX_KOTA; i++) {
+                    cout << namaKota[i];
+                    if (i < MAX_KOTA - 1) cout << "/";
+                }
+                cout << "): ";
+                getline(cin, tujuan);
+ 
+                for (int i = 0; i < MAX_KOTA; i++) {
+                    if (tujuan == namaKota[i]) {
+                        kotaValid = true;
+                        break;
+                    }
+                }
+                if (!kotaValid) cout << "  [!] Kota tidak ditemukan. Masukkan nama kota yang sesuai daftar.\n";
+            }
             pushPaket(id, pengirim, penerima, tujuan);
         } else if (pilihan == 2) {
-            cout << "\n-- Antrian Paket (Stack) --\n";
-            tampilStack();
+        cout << "\n-- Antrian Paket (Stack) --\n";
+        tampilStack();
         } else if (pilihan == 3) {
-            undoPaket();
+        undoPaket();
         } else if (pilihan == 4) {
-            kirimSemuaPaket();
+         kirimSemuaPaket();
+        } else if (pilihan != 0) {
+        cout << "  [!] Pilihan tidak valid. Masukkan angka 0-4.\n";
         }
     }
+
 }
 
 void menuGraph() {
@@ -330,26 +391,35 @@ void menuGraph() {
         cout << "  2. Tampilkan semua koneksi kota\n";
         cout << "  0. Kembali ke menu utama\n";
         cout << "Pilihan: ";
-        cin >> pilihan;
-        cin.ignore();
+        pilihan = inputAngka();
 
         if (pilihan == 1) {
             tampilDaftarKota();
-            int asal, tujuan;
-            cout << "  Pilih nomor kota ASAL   : "; cin >> asal;
-            cout << "  Pilih nomor kota TUJUAN : "; cin >> tujuan;
-            cin.ignore();
-
-            if (asal < 0 || asal >= MAX_KOTA || tujuan < 0 || tujuan >= MAX_KOTA) {
-                cout << "  [!] Nomor kota tidak valid.\n";
-            } else {
-                cout << "\n";
-                bfsRuteTerpendek(asal, tujuan);
+            int asal = -1;
+            while (asal < 0 || asal >= MAX_KOTA) {
+                cout << "  Pilih nomor kota ASAL   : ";
+                asal = inputAngka();
+                if (asal < 0 || asal >= MAX_KOTA)
+                    cout << "  [!] Nomor tidak valid. Masukkan angka 0-" << MAX_KOTA - 1 << ".\n";
             }
+ 
+            int tujuan = -1;
+            while (tujuan < 0 || tujuan >= MAX_KOTA) {
+                cout << "  Pilih nomor kota TUJUAN : ";
+                tujuan = inputAngka();
+                if (tujuan < 0 || tujuan >= MAX_KOTA)
+                    cout << "  [!] Nomor tidak valid. Masukkan angka 0-" << MAX_KOTA - 1 << ".\n";
+            }
+
+                        cout << "\n";
+            bfsRuteTerpendek(asal, tujuan);
         } else if (pilihan == 2) {
             cout << "\n-- Peta Koneksi Kota --\n";
             tampilGraphKoneksi();
+        } else if (pilihan != 0) {
+            cout << "  [!] Pilihan tidak valid. Masukkan 0, 1, atau 2.\n";
         }
+
     }
 }
 
@@ -367,8 +437,7 @@ int main() {
         cout << "  3. Cari Rute Pengiriman  (Graph + BFS)\n";
         cout << "  0. Keluar\n";
         cout << "Pilihan: ";
-        cin >> pilihan;
-        cin.ignore();
+        pilihan = inputAngka();
 
         if      (pilihan == 1) menuStack();
         else if (pilihan == 2) menuLinkedList();
